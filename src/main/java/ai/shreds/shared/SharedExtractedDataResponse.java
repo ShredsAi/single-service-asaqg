@@ -54,4 +54,19 @@ public class SharedExtractedDataResponse {
      * Nature of renovation mentioned in the document.
      */
     private String renovationNature;
+
+    /**
+     * Constructor with all parameters.
+     */
+    public SharedExtractedDataResponse(UUID documentId, String siret, String businessName, String businessAddress, String clientName, String clientAddress, BigDecimal ceeIncitationGwhc, BigDecimal primeCeeEuros, String renovationNature) {
+        this.documentId = documentId;
+        this.siret = siret;
+        this.businessName = businessName;
+        this.businessAddress = businessAddress;
+        this.clientName = clientName;
+        this.clientAddress = clientAddress;
+        this.ceeIncitationGwhc = ceeIncitationGwhc;
+        this.primeCeeEuros = primeCeeEuros;
+        this.renovationNature = renovationNature;
+    }
 }

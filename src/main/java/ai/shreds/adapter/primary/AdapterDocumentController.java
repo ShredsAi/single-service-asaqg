@@ -41,7 +41,7 @@ public class AdapterDocumentController {
             SharedExtractedDataResponse response = applicationInputPortDocument.getExtractedData(documentId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(new SharedExtractedDataResponse(false, "Data not found for the given document ID.", documentId));
+            return ResponseEntity.status(404).body(new SharedExtractedDataResponse(documentId, null, null, null, null, null, null, null, null));
         }
     }
 }

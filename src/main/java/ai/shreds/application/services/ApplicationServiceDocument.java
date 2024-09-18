@@ -3,6 +3,7 @@ package ai.shreds.application.services;
 import ai.shreds.shared.SharedUploadDocumentRequest;
 import ai.shreds.shared.SharedUploadDocumentResponse;
 import ai.shreds.shared.SharedExtractedDataResponse;
+import ai.shreds.shared.SharedExtractedDataDTO;
 import ai.shreds.application.ports.ApplicationInputPortDocument;
 import ai.shreds.application.ports.ApplicationPortOCR;
 import ai.shreds.application.ports.ApplicationPortOpenAI;
@@ -40,7 +41,8 @@ public class ApplicationServiceDocument implements ApplicationInputPortDocument 
         try {
             logger.info("Starting document upload process");
             String extractedText = ocrService.extractTextFromPDF(request.getFile());
-            DomainEntityExtractedData extractedData = openAIService.identifyFieldsInText(extractedText);
+            SharedExtractedDataDTO sharedExtractedDataDTO = openAIService.identifyFieldsInText(extractedText);
+            DomainEntityExtractedData extractedData = convertToDomainEntity(sharedExtractedDataDTO);
 
             if (!validateSiret(extractedData.getSiret()) || !validateBusinessName(extractedData.getBusinessName()) || !validateClientName(extractedData.getClientName()) || !validateExtractedData(extractedData)) {
                 throw new IllegalArgumentException("Invalid data provided.");
@@ -68,10 +70,20 @@ public class ApplicationServiceDocument implements ApplicationInputPortDocument 
             logger.info("Retrieving extracted data for document ID: " + documentId);
             List<DomainEntityExtractedData> extractedDataList = extractedDataRepository.findByDocumentId(documentId);
             if (extractedDataList.isEmpty()) {
-                throw a RuntimeException("No extracted data found for document ID: " + documentId);
+                throw new RuntimeException("No extracted data found for document ID: " + documentId);
             }
             DomainEntityExtractedData extractedData = extractedDataList.get(0);
-            return new SharedExtractedDataResponse(documentId, extractedData.getSiret(), extractedData.getBusinessName(), extractedData.getBusinessAddress(), extractedData.getClientName(), extractedData.getClientAddress(), extractedData.getCeeIncitationGwhc(), extractedData.getPrimeCeeEuros(), extractedData.getRenovationNature());
+            return new SharedExtractedDataResponse(
+                documentId,
+                extractedData.getSiret(),
+                extractedData.getBusinessName(),
+                extractedData.getBusinessAddress(),
+                extractedData.getClientName(),
+                extractedData.getClientAddress(),
+                extractedData.getCeeIncitationGwhc(),
+                extractedData.getPrimeCeeEuros(),
+                extractedData.getRenovationNature()
+            );
         } catch (Exception e) {
             logger.error("Failed to retrieve extracted data", e);
             throw new RuntimeException("Failed to retrieve extracted data: " + e.getMessage());
@@ -87,10 +99,25 @@ public class ApplicationServiceDocument implements ApplicationInputPortDocument 
     }
 
     private boolean validateClientName(String name) {
-        return name != null and !name.isEmpty();
+        return name != null && !name.isEmpty();
     }
 
     private boolean validateExtractedData(DomainEntityExtractedData extractedData) {
         return extractedData.getCeeIncitationGwhc() != null && extractedData.getPrimeCeeEuros() != null && extractedData.getRenovationNature() != null;
+    }
+
+    private DomainEntityExtractedData convertToDomainEntity(SharedExtractedDataDTO dto) {
+        DomainEntityExtractedData entity = new DomainEntityExtractedData();
+        entity.setId(dto.getId());
+        entity.setDocumentId(dto.getDocumentId());
+        entity.setSiret(dto.getSiret());
+        entity.setBusinessName(dto.getBusinessName());
+        entity.setBusinessAddress(dto.getBusinessAddress());
+        entity.setClientName(dto.getClientName());
+        entity.setClientAddress(dto.getClientAddress());
+        entity.setCeeIncitationGwhc(dto.getCeeIncitationGwhc());
+        entity.setPrimeCeeEuros(dto.getPrimeCeeEuros());
+        entity.setRenovationNature(dto.getRenovationNature());
+        return entity;
     }
 }

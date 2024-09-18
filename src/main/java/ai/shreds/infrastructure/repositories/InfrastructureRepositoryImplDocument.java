@@ -34,4 +34,18 @@ public class InfrastructureRepositoryImplDocument implements DomainPortDocumentR
         log.info("Finding document with ID: {}", documentId);
         return entityManager.find(DomainEntityDocument.class, documentId);
     }
+
+    @Override
+    public void deleteById(UUID documentId) {
+        if (documentId == null) {
+            throw new IllegalArgumentException("Document ID cannot be null");
+        }
+        log.info("Deleting document with ID: {}", documentId);
+        DomainEntityDocument document = entityManager.find(DomainEntityDocument.class, documentId);
+        if (document != null) {
+            entityManager.remove(document);
+        } else {
+            log.warn("Document with ID: {} not found", documentId);
+        }
+    }
 }

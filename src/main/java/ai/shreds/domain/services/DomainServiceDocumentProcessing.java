@@ -1,9 +1,8 @@
 package ai.shreds.domain.services;
 
-import ai.shreds.domain.entities.DomainEntityExtractedData;
+import ai.shreds.domain.DomainEntityExtractedData;
 import java.math.BigDecimal;
 import java.util.UUID;
-import javax.validation.constraints.Size;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -49,14 +48,8 @@ public class DomainServiceDocumentProcessing {
         if (!validateCeeIncitationGwhc(extractedData.getCeeIncitationGwhc())) return false;
         if (!validatePrimeCeeEuros(extractedData.getPrimeCeeEuros())) return false;
         if (!validateRenovationNature(extractedData.getRenovationNature())) return false;
-        if (extractedData.getBusinessAddress() != null) {
-            @Size(max = 1000)
-            if (extractedData.getBusinessAddress().length() > 1000) return false;
-        }
-        if (extractedData.getClientAddress() != null) {
-            @Size(max = 1000)
-            if (extractedData.getClientAddress().length() > 1000) return false;
-        }
+        if (extractedData.getBusinessAddress() != null && extractedData.getBusinessAddress().length() > 1000) return false;
+        if (extractedData.getClientAddress() != null && extractedData.getClientAddress().length() > 1000) return false;
         if (!validateUUID(extractedData.getDocumentId().toString())) return false;
         return true;
     }

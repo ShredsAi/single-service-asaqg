@@ -6,7 +6,6 @@ import ai.shreds.application.ports.ApplicationPortOCR;
 import ai.shreds.infrastructure.external_services.InfrastructureServiceOCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.FileNotFoundException;
 
 @Service
 public class ApplicationServiceOCR implements ApplicationPortOCR {
@@ -22,9 +21,6 @@ public class ApplicationServiceOCR implements ApplicationPortOCR {
     public String extractTextFromPDF(MultipartFile file) {
         try {
             return ocrService.extractTextFromPDF(file);
-        } catch (FileNotFoundException e) {
-            logger.error("File not found: {}", file.getOriginalFilename(), e);
-            throw new RuntimeException("File not found: " + file.getOriginalFilename(), e);
         } catch (Exception e) {
             logger.error("Unexpected error during OCR processing for file: {}", file.getOriginalFilename(), e);
             throw new RuntimeException("Unexpected error during OCR processing", e);
